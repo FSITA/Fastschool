@@ -42,7 +42,7 @@ const SourceForm: React.FC<SourceFormProps> = ({ onSubmit }) => {
           <option value="pdf">PDF</option>
           <option value="youtube">YouTube Link</option>
           <option value="wikipedia">Wikipedia Link</option>
-          <option value="text">Topic / Text</option>
+          <option value="topic">Topic / Text</option>
         </select>
       </label>
 

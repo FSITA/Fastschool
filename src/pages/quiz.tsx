@@ -1,69 +1,61 @@
+// src/pages/quiz.tsx
 import { useState } from "react";
 import SourceForm from "../components/SourceForm";
 
 export default function QuizPage() {
   const [loading, setLoading] = useState(false);
-  const [quizResult, setQuizResult] = useState<string | null>(null);
+  const [quiz, setQuiz] = useState<string | null>(null);
 
-  // Handle form submit
-  const handleFormSubmit = async (formData: {
-    sourceType: string;
-    sourceValue: string;
-    difficulty: string;
-  }) => {
-    console.log("Form Data:", formData);
-
-    // Only handle Topic/Text for now
-    if (formData.sourceType !== "Topic/Text") {
-      alert("Only Topic/Text works for now!");
-      return;
-    }
-
+  const handleFormSubmit = async (data: any) => {
+    console.log("🔹 Form submitted with data:", data); // DEBUG 1
     setLoading(true);
-    setQuizResult(null);
+    setQuiz(null);
 
     try {
       const response = await fetch("/api/generate-quiz", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       });
 
-      const data = await response.json();
-      setQuizResult(data.result);
-    } catch (error) {
-      console.error("Error generating quiz:", error);
-      setQuizResult("❌ Failed to generate quiz. Check console for details.");
-    }
+      console.log("🔹 API response status:", response.status); // DEBUG 2
 
-    setLoading(false);
+      const result = await response.json();
+      console.log("🔹 API response JSON:", result); // DEBUG 3
+
+      setQuiz(result.quiz || "No quiz generated.");
+    } catch (error) {
+      console.error("❌ Error generating quiz:", error);
+      setQuiz("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>📝 Quiz AI</h1>
-      <p>Generate quizzes based on your topic.</p>
+    <main className="flex flex-col items-center p-6">
+      <h1 className="text-3xl font-bold text-blue-600 mb-6">Quiz AI</h1>
 
-      {/* Shared form */}
-      <SourceForm onSubmit={handleFormSubmit} />
+      {!quiz && (
+        <SourceForm onSubmit={handleFormSubmit} />
+      )}
 
-      {loading && <p>⏳ Generating quiz...</p>}
+      {loading && <p className="mt-4 text-gray-600">Generating quiz...</p>}
 
-      {quizResult && (
-        <div style={{ marginTop: "2rem" }}>
-          <h2>Generated Quiz</h2>
-          <pre
-            style={{
-              background: "#f4f4f4",
-              padding: "1rem",
-              whiteSpace: "pre-wrap",
-              borderRadius: "5px",
-            }}
+      {quiz && (
+        <div className="mt-6 w-full max-w-2xl bg-white shadow-md rounded-lg p-4">
+          <h2 className="text-xl font-semibold mb-2">Generated Quiz</h2>
+          <pre className="whitespace-pre-wrap text-gray-800">{quiz}</pre>
+          <button
+            onClick={() => setQuiz(null)}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
-            {quizResult}
-          </pre>
+            Regenerate
+          </button>
         </div>
       )}
-    </div>
+    </main>
   );
 }
