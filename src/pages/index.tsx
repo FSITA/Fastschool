@@ -7,7 +7,7 @@ export default function Home() {
         Welcome to FastSchool AI
       </h1>
       <p className="mt-4 text-lg text-gray-700">
-        Your AI-powered teaching assistant.
+        Your AI-powered teaching assistants.
       </p>
       <Link
         href="/dashboard"
